@@ -1,66 +1,47 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { AppShell } from '@/components/layout/AppShell';
+import { RecipeGrid } from '@/components/recipes/RecipeGrid';
+import { ShoppingExportModal } from '@/components/shopping/ShoppingExportModal';
+import { ImportButton } from '@/components/layout/ImportButton';
+import { useRecipes } from '@/context/RecipeContext';
+import { exportRecipesJson } from '@/lib/utils/export';
+
+export default function HomePage() {
+  const { recipes } = useRecipes();
+  const [showShopping, setShowShopping] = useState(false);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <AppShell>
+      <header className="dashboard__header">
+        <h1 className="dashboard__title">Mein Rezeptbuch</h1>
+        <div className="dashboard__actions">
+          <button
+            type="button"
+            className="dashboard__export-btn"
+            onClick={() => exportRecipesJson(recipes)}
+            aria-label="Rezepte als JSON exportieren"
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Exportieren
+          </button>
+          <ImportButton />
+          <button
+            type="button"
+            className="dashboard__shopping-btn"
+            onClick={() => setShowShopping(true)}
+            aria-label="Einkaufsliste erstellen"
           >
-            Documentation
-          </a>
+            Einkaufsliste
+          </button>
+          <Link href="/rezept/neu" className="dashboard__add-btn" aria-label="Neues Rezept hinzufügen">
+            + Hinzufügen
+          </Link>
         </div>
-      </main>
-    </div>
+      </header>
+      <RecipeGrid recipes={recipes} />
+      {showShopping && <ShoppingExportModal onClose={() => setShowShopping(false)} />}
+    </AppShell>
   );
 }
